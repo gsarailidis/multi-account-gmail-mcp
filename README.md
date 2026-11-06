@@ -19,6 +19,13 @@ An [MCP](https://modelcontextprotocol.io) server that gives Claude Code (or any 
 | Organize | `modify_labels`, `move_emails`, `archive_emails`, `mark_emails` (read/unread, star, important, spam) |
 | Delete | `trash_emails`, `untrash_emails`, `delete_emails_permanently` |
 
+Every tool can also be run from a shell, which is how Claude uses it in cloud sessions:
+
+```bash
+multi-account-gmail-mcp tools
+multi-account-gmail-mcp call search_emails '{"account": "work", "query": "is:unread"}'
+```
+
 Search uses normal Gmail syntax (`from:`, `is:unread`, `has:attachment`, `newer_than:7d`, `label:`…). Labels can be given by name.
 
 ## Configuration
@@ -50,7 +57,9 @@ See **[SETUP.md](SETUP.md)** for a step-by-step guide. In short:
 1. Create a Google Cloud OAuth client and set the app to *In production*.
 2. Run `multi-account-gmail-mcp auth <alias>` once per Gmail account to get its refresh token.
 3. Store the values as environment variables, either in a Claude Code cloud environment or in a local `.env` file.
-4. Register the server: `claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp`
+4. Register it with Claude Code:
+   - On your computer: `claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp`
+   - In cloud sessions: use the environment setup script in [`scripts/cloud-setup.sh`](scripts/cloud-setup.sh). It runs `multi-account-gmail-mcp install-instructions`, which tells Claude to use the tool through the shell.
 
 ## Security
 

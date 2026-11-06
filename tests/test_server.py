@@ -258,3 +258,35 @@ async def test_revoked_token_hint(fake):
     srv = create_server(lambda: load_config(env), http)
     res = await call(srv, "search_emails")
     assert "auth personal" in res["error"]
+
+
+# ---------------------------------------------------------------------- cli
+def test_cli_call_and_tools(monkeypatch, capsys, fake):
+    from multi_account_gmail_mcp import cli, server as server_mod
+
+    http = httpx.AsyncClient(transport=httpx.MockTransport(fake.handler))
+    real = server_mod.create_server
+    monkeypatch.setattr(server_mod, "create_server", lambda: real(lambda: load_config(ENV), http))
+
+    assert cli.main(["call", "search_emails", '{"account": "work", "query": "x"}']) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["account"] == "work" and out["messages"][0]["subject"] == "Plans"
+
+    assert cli.main(["call", "send_email", '{"account": "work", "to": ["a@b.c"], "subject": "s", "body": "b"}']) == 1
+    assert "does not allow 'send'" in json.loads(capsys.readouterr().out)["error"]
+
+    assert cli.main(["tools"]) == 0
+    listing = capsys.readouterr().out
+    assert "send_email(to: list, subject: string, body: string" in listing
+
+
+def test_install_instructions_is_idempotent(tmp_path):
+    from multi_account_gmail_mcp import cli
+
+    md = tmp_path / "CLAUDE.md"
+    md.write_text("# My notes\n")
+    cli.main(["install-instructions", "--path", str(md)])
+    cli.main(["install-instructions", "--path", str(md)])
+    text = md.read_text()
+    assert text.startswith("# My notes")
+    assert text.count(cli.CLAUDE_MD_START) == 1

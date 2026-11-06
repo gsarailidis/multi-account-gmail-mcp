@@ -4,3 +4,4 @@
 REPO="git+https://github.com/gsarailidis/multi-account-gmail-mcp"
 pip install --quiet "$REPO" || pip install --quiet --break-system-packages "$REPO"
 claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp 2>/dev/null || true
+multi-account-gmail-mcp install-instructions

@@ -94,12 +94,15 @@ In the same environment settings, paste this into **Setup script**. It is also i
 
 ```bash
 #!/bin/bash
-pip install --quiet "git+https://github.com/gsarailidis/multi-account-gmail-mcp" \
-  || pip install --quiet --break-system-packages "git+https://github.com/gsarailidis/multi-account-gmail-mcp"
+REPO="git+https://github.com/gsarailidis/multi-account-gmail-mcp"
+pip install --quiet "$REPO" || pip install --quiet --break-system-packages "$REPO"
 claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp 2>/dev/null || true
+multi-account-gmail-mcp install-instructions
 ```
 
-Save. Every **new** session in this environment now starts with the Gmail tools, whichever repository you open.
+The last line adds a short note to Claude Code's personal instructions (`~/.claude/CLAUDE.md`). Cloud sessions don't load MCP servers registered with `claude mcp add`, so in the cloud Claude runs the tools as shell commands (`multi-account-gmail-mcp call …`). The note tells Claude how, and to use this instead of the single-account Gmail connector.
+
+Save. Every **new** session in this environment now has the Gmail tools, whichever repository you open.
 
 ## Step 5 — Check it
 
