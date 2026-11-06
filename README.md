@@ -19,7 +19,7 @@ An [MCP](https://modelcontextprotocol.io) server that gives Claude Code (or any 
 | Organize | `modify_labels`, `move_emails`, `archive_emails`, `mark_emails` (read/unread, star, important, spam) |
 | Delete | `trash_emails`, `untrash_emails`, `delete_emails_permanently` |
 
-Every tool can also be run from a shell, which is how Claude uses it in cloud sessions:
+Every tool can also be run from a shell (a fallback if the MCP tools are not loaded):
 
 ```bash
 multi-account-gmail-mcp tools
@@ -59,7 +59,7 @@ See **[SETUP.md](SETUP.md)** for a step-by-step guide. In short:
 3. Store the values as environment variables, either in a Claude Code cloud environment or in a local `.env` file.
 4. Register it with Claude Code:
    - On your computer: `claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp`
-   - In cloud sessions: use the environment setup script in [`scripts/cloud-setup.sh`](scripts/cloud-setup.sh). It runs `multi-account-gmail-mcp install-instructions`, which tells Claude to use the tool through the shell.
+   - In cloud sessions: use the environment setup script in [`scripts/cloud-setup.sh`](scripts/cloud-setup.sh). It also runs `multi-account-gmail-mcp install-instructions`, which tells Claude to prefer these tools over the single-account Gmail connector.
 
 ## Security
 

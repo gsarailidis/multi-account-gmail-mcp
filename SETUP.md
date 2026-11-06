@@ -100,7 +100,7 @@ claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp 2>/dev/null |
 multi-account-gmail-mcp install-instructions
 ```
 
-The last line adds a short note to Claude Code's personal instructions (`~/.claude/CLAUDE.md`). Cloud sessions don't load MCP servers registered with `claude mcp add`, so in the cloud Claude runs the tools as shell commands (`multi-account-gmail-mcp call …`). The note tells Claude how, and to use this instead of the single-account Gmail connector.
+The last line adds a short note to Claude Code's personal instructions (`~/.claude/CLAUDE.md`). It tells Claude to use these tools for email, and not the built-in single-account Gmail connector, which it would otherwise pick on its own. It also tells Claude it can run the tools from the shell (`multi-account-gmail-mcp call …`) if the MCP tools are ever missing.
 
 Save. Every **new** session in this environment now has the Gmail tools, whichever repository you open.
 
