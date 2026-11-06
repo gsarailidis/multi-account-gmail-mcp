@@ -82,7 +82,7 @@ GMAIL_TOKEN_OLD=1//0g...
 GMAIL_CONFIG={"default_account":"personal"}
 ```
 
-If your app shows a separate **secrets** section, put the client secret and tokens there.
+Use **Environment variables**, not *Network secrets*: network secrets can only add a fixed header for one host, while this tool sends the refresh tokens in the request body and switches between several accounts.
 
 `GMAIL_CONFIG` is optional. See the README for per-account permissions, e.g. making an account read-only.
 
