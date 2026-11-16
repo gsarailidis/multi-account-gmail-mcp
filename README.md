@@ -61,6 +61,17 @@ See **[SETUP.md](SETUP.md)** for a step-by-step guide. In short:
    - On your computer: `claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp`
    - In cloud sessions: use the environment setup script in [`scripts/cloud-setup.sh`](scripts/cloud-setup.sh). It also runs `multi-account-gmail-mcp install-instructions`, which tells Claude to prefer these tools over the single-account Gmail connector.
 
+### With OpenAI Codex
+
+- **Codex app or CLI on your computer:** `codex mcp add gmail-multi -- multi-account-gmail-mcp`,
+  then `multi-account-gmail-mcp install-instructions --path ~/.codex/AGENTS.md`. Credentials
+  come from the same `~/.config/multi-account-gmail-mcp/.env` file.
+- **Codex cloud:** use [`scripts/codex-cloud-setup.sh`](scripts/codex-cloud-setup.sh) as the
+  environment's setup script. Store the `GMAIL_*` values as **environment variables** (Codex
+  removes *secrets* before the agent runs), and allow the agent internet access to
+  `gmail.googleapis.com` and `oauth2.googleapis.com`. MCP servers are not documented for cloud
+  tasks, so Codex uses the command-line form: `multi-account-gmail-mcp call TOOL 'JSON'`.
+
 ## Security
 
 - Each refresh token gives **full access to that mailbox**. Keep tokens out of git, chats and screenshots. To revoke one, go to <https://myaccount.google.com/permissions> → your app → *Remove access*.
