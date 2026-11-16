@@ -20,6 +20,7 @@ import getpass
 import hashlib
 import http.server
 import json
+import os
 import secrets
 import shutil
 import subprocess
@@ -313,7 +314,10 @@ def cmd_install_instructions(path_str: str) -> int:
     return 0
 
 
-INSTRUCTION_FILES = ("~/.claude/CLAUDE.md", "~/.codex/AGENTS.md")
+def _instruction_files() -> list[str]:
+    """Claude Code's global instructions, and Codex's ($CODEX_HOME/AGENTS.md, default ~/.codex)."""
+    codex_home = os.environ.get("CODEX_HOME") or "~/.codex"
+    return ["~/.claude/CLAUDE.md", str(Path(codex_home) / "AGENTS.md")]
 MCP_REGISTER = {
     "claude": ["claude", "mcp", "add", "--scope", "user", "gmail-multi", "--", "multi-account-gmail-mcp"],
     "codex": ["codex", "mcp", "add", "gmail-multi", "--", "multi-account-gmail-mcp"],
@@ -334,7 +338,7 @@ def cmd_setup() -> int:
         done = subprocess.run(command, capture_output=True, text=True)
         status = "registered" if done.returncode == 0 else f"already registered or failed (check: {command[0]} mcp list)"
         print(f"{name}: MCP server {status}")
-    for path in INSTRUCTION_FILES:
+    for path in _instruction_files():
         cmd_install_instructions(path)
     return 0
 

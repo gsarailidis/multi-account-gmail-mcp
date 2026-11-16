@@ -304,3 +304,13 @@ def test_cli_setup_writes_both_instruction_files(monkeypatch, tmp_path, capsys):
     assert cli.main(["setup"]) == 0  # idempotent: one block per file
     assert (tmp_path / ".claude/CLAUDE.md").read_text().count(cli.CLAUDE_MD_START) == 1
     assert "not installed" in capsys.readouterr().out
+
+
+def test_cli_setup_follows_codex_home(monkeypatch, tmp_path):
+    from multi_account_gmail_mcp import cli
+
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("CODEX_HOME", str(tmp_path / "agent-codex"))
+    monkeypatch.setattr(cli.shutil, "which", lambda name: None)
+    assert cli.main(["setup"]) == 0
+    assert cli.CLAUDE_MD_START in (tmp_path / "agent-codex" / "AGENTS.md").read_text()
