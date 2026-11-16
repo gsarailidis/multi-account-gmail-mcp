@@ -57,18 +57,15 @@ See **[SETUP.md](SETUP.md)** for a step-by-step guide. In short:
 1. Create a Google Cloud OAuth client and set the app to *In production*.
 2. Run `multi-account-gmail-mcp auth <alias>` once per Gmail account to get its refresh token.
 3. Store the values as environment variables, either in a Claude Code cloud environment or in a local `.env` file.
-4. Register it with Claude Code:
-   - On your computer: `claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp`
-   - In cloud sessions: use the environment setup script in [`scripts/cloud-setup.sh`](scripts/cloud-setup.sh). It also runs `multi-account-gmail-mcp install-instructions`, which tells Claude to prefer these tools over the single-account Gmail connector.
+4. Run `multi-account-gmail-mcp setup`. It registers the server with Claude Code and/or OpenAI
+   Codex (whichever is installed) and tells them how to use it (`~/.claude/CLAUDE.md`,
+   `~/.codex/AGENTS.md`). In a cloud environment, use [`scripts/cloud-setup.sh`](scripts/cloud-setup.sh)
+   as the setup script: it installs the package and runs `setup`.
 
 ### With OpenAI Codex
-
-- **Codex app or CLI on your computer:** `codex mcp add gmail-multi -- multi-account-gmail-mcp`,
-  then `multi-account-gmail-mcp install-instructions --path ~/.codex/AGENTS.md`. Credentials
-  come from the same `~/.config/multi-account-gmail-mcp/.env` file.
-- **Codex cloud:** use [`scripts/codex-cloud-setup.sh`](scripts/codex-cloud-setup.sh) as the
-  environment's setup script. Store the `GMAIL_*` values as **environment variables** (Codex
-  removes *secrets* before the agent runs), and allow the agent internet access to
+- Same `setup` command, on your computer or in a Codex cloud environment.
+- In **Codex cloud**, store the `GMAIL_*` values as **environment variables**, not *secrets*
+  (Codex removes secrets before the agent runs), and allow the agent internet access to
   `gmail.googleapis.com` and `oauth2.googleapis.com`. MCP servers are not documented for cloud
   tasks, so Codex uses the command-line form: `multi-account-gmail-mcp call TOOL 'JSON'`.
 

@@ -290,3 +290,17 @@ def test_install_instructions_is_idempotent(tmp_path):
     text = md.read_text()
     assert text.startswith("# My notes")
     assert text.count(cli.CLAUDE_MD_START) == 1
+
+
+def test_cli_setup_writes_both_instruction_files(monkeypatch, tmp_path, capsys):
+    from multi_account_gmail_mcp import cli
+
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setattr(cli.shutil, "which", lambda name: None)
+    assert cli.main(["setup"]) == 0
+    for rel in (".claude/CLAUDE.md", ".codex/AGENTS.md"):
+        text = (tmp_path / rel).read_text()
+        assert cli.CLAUDE_MD_START in text and "multi-account-gmail-mcp call" in text
+    assert cli.main(["setup"]) == 0  # idempotent: one block per file
+    assert (tmp_path / ".claude/CLAUDE.md").read_text().count(cli.CLAUDE_MD_START) == 1
+    assert "not installed" in capsys.readouterr().out

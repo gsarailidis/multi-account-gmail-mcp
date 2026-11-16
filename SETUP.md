@@ -96,11 +96,10 @@ In the same environment settings, paste this into **Setup script**. It is also i
 #!/bin/bash
 REPO="git+https://github.com/gsarailidis/multi-account-gmail-mcp"
 pip install --quiet "$REPO" || pip install --quiet --break-system-packages "$REPO"
-claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp 2>/dev/null || true
-multi-account-gmail-mcp install-instructions
+multi-account-gmail-mcp setup
 ```
 
-The last line adds a short note to Claude Code's personal instructions (`~/.claude/CLAUDE.md`). It tells Claude to use these tools for email, and not the built-in single-account Gmail connector, which it would otherwise pick on its own. It also tells Claude it can run the tools from the shell (`multi-account-gmail-mcp call …`) if the MCP tools are ever missing.
+`setup` registers the server with Claude Code (and with Codex, if it is installed) and adds a short note to the agents' personal instructions (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`). It tells Claude to use these tools for email, and not the built-in single-account Gmail connector, which it would otherwise pick on its own. It also tells Claude it can run the tools from the shell (`multi-account-gmail-mcp call …`) if the MCP tools are ever missing.
 
 Save. Every **new** session in this environment now has the Gmail tools, whichever repository you open.
 
@@ -126,10 +125,10 @@ pip install git+https://github.com/gsarailidis/multi-account-gmail-mcp
 ```
 
 ```bash
-claude mcp add --scope user gmail-multi -- multi-account-gmail-mcp
+multi-account-gmail-mcp setup
 ```
 
-Credentials come from `~/.config/multi-account-gmail-mcp/.env`, written by `auth --save`, or from your shell environment.
+This registers it with Claude Code and/or Codex, whichever is installed. Credentials come from `~/.config/multi-account-gmail-mcp/.env`, written by `auth --save`, or from your shell environment.
 
 ---
 

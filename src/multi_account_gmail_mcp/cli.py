@@ -5,8 +5,10 @@
     multi-account-gmail-mcp check           test every configured account
     multi-account-gmail-mcp tools           list the tools and their parameters
     multi-account-gmail-mcp call TOOL JSON  run one tool from the shell, print JSON
+    multi-account-gmail-mcp setup           register with Claude Code and/or Codex (whichever
+                                            is installed) and write the usage instructions for both
     multi-account-gmail-mcp install-instructions
-                                            tell Claude Code (~/.claude/CLAUDE.md) how to use this
+                                            write the usage instructions to one file
 """
 
 from __future__ import annotations
@@ -19,6 +21,8 @@ import hashlib
 import http.server
 import json
 import secrets
+import shutil
+import subprocess
 import sys
 import threading
 import urllib.parse
@@ -273,7 +277,8 @@ For anything about their email, use it, not the built-in Gmail connector
 (that one only reaches a single account). Use the connector only if the user
 asks for it by name.
 
-- If tools named `mcp__gmail-multi__*` are available, use them.
+- If the `gmail-multi` MCP tools are available (in Claude Code: `mcp__gmail-multi__*`),
+  use them.
 - Otherwise run the same tools from Bash:
   - `multi-account-gmail-mcp tools` lists every tool and its parameters.
   - `multi-account-gmail-mcp call TOOL 'JSON_ARGS'` runs one and prints JSON,
@@ -308,6 +313,32 @@ def cmd_install_instructions(path_str: str) -> int:
     return 0
 
 
+INSTRUCTION_FILES = ("~/.claude/CLAUDE.md", "~/.codex/AGENTS.md")
+MCP_REGISTER = {
+    "claude": ["claude", "mcp", "add", "--scope", "user", "gmail-multi", "--", "multi-account-gmail-mcp"],
+    "codex": ["codex", "mcp", "add", "gmail-multi", "--", "multi-account-gmail-mcp"],
+}
+
+
+def cmd_setup() -> int:
+    """One-step setup for an agent environment (Claude Code or Codex, cloud or local).
+
+    Registers the MCP server with every agent CLI found on PATH (an existing registration
+    is left alone) and writes the usage instructions to both agents' global instruction
+    files. Safe to run at every session start.
+    """
+    for name, command in MCP_REGISTER.items():
+        if shutil.which(command[0]) is None:
+            print(f"{name}: not installed, MCP registration skipped")
+            continue
+        done = subprocess.run(command, capture_output=True, text=True)
+        status = "registered" if done.returncode == 0 else f"already registered or failed (check: {command[0]} mcp list)"
+        print(f"{name}: MCP server {status}")
+    for path in INSTRUCTION_FILES:
+        cmd_install_instructions(path)
+    return 0
+
+
 # --------------------------------------------------------------------- main
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="multi-account-gmail-mcp", description=__doc__,
@@ -328,8 +359,9 @@ def main(argv: list[str] | None = None) -> int:
     p_call = sub.add_parser("call", help="run one tool from the shell and print JSON")
     p_call.add_argument("tool", help="tool name, e.g. search_emails")
     p_call.add_argument("args", nargs="?", default="{}", help="JSON object of arguments, or - for stdin")
+    sub.add_parser("setup", help="register with Claude Code and/or Codex and write the usage instructions")
     p_instr = sub.add_parser("install-instructions",
-                             help="add usage instructions for Claude Code to a CLAUDE.md file")
+                             help="write the usage instructions to one instructions file")
     p_instr.add_argument("--path", default="~/.claude/CLAUDE.md")
     args = parser.parse_args(argv)
 
@@ -341,6 +373,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_tools()
     if args.command == "call":
         return cmd_call(args.tool, args.args)
+    if args.command == "setup":
+        return cmd_setup()
     if args.command == "install-instructions":
         return cmd_install_instructions(args.path)
     from .server import create_server
